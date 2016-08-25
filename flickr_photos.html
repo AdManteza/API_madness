@@ -1,0 +1,95 @@
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script>
+  </head>
+  <body>
+    <div class="container-fluid text-center">
+      <h1>FLICKR MADNESS</h1>
+
+      <div class="card">
+        <img id="slider" class="card-img-top">
+        <div class="card-block">
+          <h4 id="photo-title" class="card-title"></h4>
+          <div id="comment"></div>
+          <!-- <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> -->
+          <!-- <a href="#" class="btn btn-primary">Go somewhere</a> -->
+        </div>
+      </div>
+           
+    </div>
+
+    <script>
+      const API_KEY = "48decd236d06ecdb4402cd1703f2bbc0";
+      const API_SECRET = "6816f218d2bf20d6";
+
+      // https://farm${farmId}.staticflickr.com/${serverId}/${id}_${secret}.jpg
+      function loadImage(photo) { 
+        document.getElementById("slider").
+        src = `https://farm${photo.farm}.staticflickr.com/${photo.server}/${photo.id}_${photo.secret}_z.jpg`;
+        document.getElementById('photo-title').innerHTML = photo.title;
+      };
+
+      function loadImageComments(photo) {
+        $.ajax({
+          url: `https://api.flickr.com/services/rest/?method=flickr.photos.comments.getList&api_key=${API_KEY}&photo_id=${photo.id}&format=json&nojsoncallback=1`,
+          method: 'GET',
+          success: function(response) { 
+            
+            // console.log(response.comments.comment[0]._content);
+    
+            response.comments.comment.forEach(function(comment, ind) {
+              // setTimeout(function() {
+              $("#comment").append($(`<li>${comment._content}</li>`));
+              // }, 4000 * ind);
+              // console.log(comment._content);
+            });
+          },
+          error: function(error) {
+            console.log(error); 
+          }
+        });
+      };
+
+      $(document).ready(function () {
+        
+        $.ajax({
+          url: `https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${API_KEY}&tags=lighthouse&format=json&nojsoncallback=1`,
+          method: 'GET',
+          success: function(response) { 
+            
+            response.photos.photo.forEach(function(photo, ind) { 
+              
+              setTimeout(function() {
+                $('#comment').empty();
+                $('#slider').fadeIn(4000);
+                loadImage(photo);
+                loadImageComments(photo);
+                $('#slider').fadeOut(4000);
+              }, 8000 * ind);
+                 
+            });    
+          },
+          error: function(error) {
+            console.log(error); 
+          }
+        });
+
+
+        
+
+        
+          
+
+
+
+    
+        
+
+
+
+      });
+    </script>
+  </body>
+</html>
+
